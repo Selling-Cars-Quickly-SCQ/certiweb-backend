@@ -1,0 +1,6 @@
+@CertiWeb.API_HostAddress = http://localhost:5117
+
+GET {{CertiWeb.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
