@@ -40,6 +40,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
    protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // User Context
         builder.Entity<User>().HasKey(d=>d.Id);
         builder.Entity<User>().Property(d => d.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<User>().Property(d=>d.name).IsRequired();
@@ -47,7 +49,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<User>().Property(d=>d.password).IsRequired();
         builder.Entity<User>().Property(d=>d.plan).IsRequired();
         
-        // Configuración de las columnas de auditoría
+        // Audit columns for User Context
         builder.Entity<User>().Property(d => d.CreatedDate).HasColumnName("created_at");
         builder.Entity<User>().Property(d => d.UpdatedDate).HasColumnName("updated_at");
         
