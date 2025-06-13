@@ -39,4 +39,14 @@ public class UserQueryServiceImpl(IUserRepository userRepository) : IUserQuerySe
     {
         return await userRepository.FindUserByEmailAsync(query.email);
     }
+    
+    /// <summary>
+    /// Retrieves a user by their email address and password for authentication.
+    /// </summary>
+    /// <param name="query">The query containing the email and password to search for.</param>
+    /// <returns>The user if found with matching credentials, null otherwise.</returns>
+    public async Task<User?> Handle(GetUserByEmailAndPassword query)
+    {
+        return await userRepository.FindUserByEmailAndPasswordAsync(query.email, query.password);
+    }
 }
