@@ -60,4 +60,20 @@ public class UsersController(IUserCommandService userCommandService, IUserQueryS
         var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
         return Ok(userResource);
     }
+
+    /// <summary>
+    /// Authenticates a user by email and password via GET request.
+    /// </summary>
+    /// <param name="email">The email address of the user.</param>
+    /// <param name="password">The password of the user.</param>
+    /// <returns>The user resource if authentication is successful, Unauthorized if credentials are invalid.</returns>
+    [HttpGet("login")]
+    public async Task<ActionResult<UserResource>> LoginUser([FromQuery] string email, [FromQuery] string password)
+    {
+        var getUserByEmailAndPasswordQuery = new GetUserByEmailAndPassword(email, password);
+        var user = await userQueryService.Handle(getUserByEmailAndPasswordQuery);
+        if (user == null) return Unauthorized("Invalid email or password");
+        var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
+        return Ok(userResource);
+    }
 }
