@@ -2,11 +2,11 @@ using CertiWeb.API.IAM.Domain.Model.Entities;
 using CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 using Microsoft.EntityFrameworkCore;
-
+﻿using CertiWeb.API.Users.Domain.Model.Aggregates;
 namespace CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 /// <summary>
-///     Application database context for the CertiWeb Platform
+/// Application database context for the Certi Web Platform API.
 /// </summary>
 /// <param name="options">
 ///     The options for the database context
@@ -46,17 +46,20 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        // Configure User entity
-        builder.Entity<User>(entity =>
-        {
-            entity.HasKey(u => u.Id);
-            entity.Property(u => u.Name).IsRequired().HasMaxLength(100);
-            entity.Property(u => u.Email).IsRequired().HasMaxLength(255);
-            entity.Property(u => u.PasswordHash).IsRequired();
-            entity.HasIndex(u => u.Email).IsUnique();
-        });
-
+    
+        // User Context
+        builder.Entity<User>().HasKey(d=>d.Id);
+        builder.Entity<User>().Property(d => d.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<User>().Property(d=>d.name).IsRequired();
+        builder.Entity<User>().Property(d=>d.email).IsRequired();
+        builder.Entity<User>().Property(d=>d.password).IsRequired();
+        builder.Entity<User>().Property(d=>d.plan).IsRequired();
+        
+        // Audit columns for User Context
+        builder.Entity<User>().Property(d => d.CreatedDate).HasColumnName("created_at");
+        builder.Entity<User>().Property(d => d.UpdatedDate).HasColumnName("updated_at");
+        
         builder.UseSnakeCaseNamingConvention();
     }
+    public DbSet<User> Users { get; set; }
 }

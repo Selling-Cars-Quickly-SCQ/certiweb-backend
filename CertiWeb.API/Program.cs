@@ -2,6 +2,11 @@ using CertiWeb.API.Shared.Domain.Repositories;
 using CertiWeb.API.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 using CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.Users.Application.Internal.CommandServices;
+using CertiWeb.API.Users.Application.Internal.QueryServices;
+using CertiWeb.API.Users.Domain.Repositories;
+using CertiWeb.API.Users.Domain.Services;
+using CertiWeb.API.Users.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -50,7 +55,7 @@ builder.Services.AddSwaggerGen(options =>
             TermsOfService = new Uri("https://acme-learning.com/tos"),
             Contact = new OpenApiContact
             {
-                Name = "ACME Studios",
+                Name = "Certi Web",
                 Email = "contact@acme.com"
             },
             License = new OpenApiLicense
@@ -66,6 +71,11 @@ builder.Services.AddSwaggerGen(options =>
 
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Users Bounded Context
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserCommandService, UserCommandServiceImpl>();
+builder.Services.AddScoped<IUserQueryService, UserQueryServiceImpl>();
 
 var app = builder.Build();
 
