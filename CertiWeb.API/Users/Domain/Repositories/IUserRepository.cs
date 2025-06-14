@@ -1,4 +1,4 @@
-﻿using CertiWeb.API.Shared.Domain.Repositories;
+using CertiWeb.API.Shared.Domain.Repositories;
 using CertiWeb.API.Users.Domain.Model.Aggregates;
 
 namespace CertiWeb.API.Users.Domain.Repositories;
