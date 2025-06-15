@@ -2,7 +2,10 @@
 using CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using EntityFrameworkCore.CreatedUpdatedDate.Extensions;
 using Microsoft.EntityFrameworkCore;
-﻿using CertiWeb.API.Users.Domain.Model.Aggregates;
+using CertiWeb.API.Users.Domain.Model.Aggregates;
+using CertiWeb.API.Certifications.Domain.Model.Aggregates;
+using CertiWeb.API.Certifications.Infrastructure;
+
 namespace CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 /// <summary>
@@ -77,7 +80,83 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             entity.ToTable("reservations");
         });
         
+        // Certifications Context - Brand Configuration
+        builder.Entity<Brand>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.Id).IsRequired().ValueGeneratedOnAdd();
+            entity.Property(b => b.Name).IsRequired().HasMaxLength(100);
+            entity.Property(b => b.IsActive).IsRequired().HasDefaultValue(true);
+            
+            entity.ToTable("brands");
+        });
+        
+        // Certifications Context - Car Configuration
+        builder.Entity<Car>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id).IsRequired().ValueGeneratedOnAdd();
+            entity.Property(c => c.Title).IsRequired().HasMaxLength(200);
+            entity.Property(c => c.Owner).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.OwnerEmail).IsRequired().HasMaxLength(255);
+            entity.Property(c => c.Model).IsRequired().HasMaxLength(100);
+            entity.Property(c => c.Description).HasMaxLength(1000);
+            entity.Property(c => c.ImageUrl).HasMaxLength(500);
+            entity.Property(c => c.OriginalReservationId).IsRequired();
+            
+            // Value Objects Configuration
+            entity.Property(c => c.Year)
+                .HasConversion(
+                    year => year.Value,
+                    value => new CertiWeb.API.Certifications.Domain.Model.ValueObjects.Year(value)
+                )
+                .IsRequired();
+                
+            entity.Property(c => c.Price)
+                .HasConversion(
+                    price => price.Value,
+                    value => new CertiWeb.API.Certifications.Domain.Model.ValueObjects.Price(value, "SOL")
+                )
+                .HasPrecision(18, 2)
+                .IsRequired();
+                
+            entity.Property(c => c.LicensePlate)
+                .HasConversion(
+                    plate => plate.Value,
+                    value => new CertiWeb.API.Certifications.Domain.Model.ValueObjects.LicensePlate(value)
+                )
+                .HasMaxLength(10)
+                .IsRequired();
+                
+            entity.Property(c => c.PdfCertification)
+                .HasConversion(
+                    pdf => pdf.Base64Data,
+                    value => new CertiWeb.API.Certifications.Domain.Model.ValueObjects.PdfCertification(value)
+                )
+                .HasColumnType("LONGTEXT")
+                .IsUnicode(false)
+                .IsRequired();
+            
+            // Foreign Key Configuration
+            entity.HasOne(c => c.Brand)
+                .WithMany()
+                .HasForeignKey(c => c.BrandId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // Unique Constraints
+            entity.HasIndex(c => c.LicensePlate).IsUnique();
+            entity.HasIndex(c => c.OriginalReservationId).IsUnique();
+            
+            entity.ToTable("cars");
+        });
+        
+        // Seed Brand Data
+        builder.Entity<Brand>().HasData(BrandSeeder.GetPredefinedBrands());
+        
         builder.UseSnakeCaseNamingConvention();
     }
+    
     public DbSet<User> Users { get; set; }
+    public DbSet<Brand> Brands { get; set; }
+    public DbSet<Car> Cars { get; set; }
 }
