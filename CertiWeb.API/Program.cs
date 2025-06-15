@@ -17,6 +17,10 @@ using CertiWeb.API.Certifications.Application.Internal.QueryServices;
 using CertiWeb.API.Certifications.Domain.Repositories;
 using CertiWeb.API.Certifications.Domain.Services;
 using CertiWeb.API.Certifications.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.IAM.Application.Internal.QueryServices;
+using CertiWeb.API.IAM.Domain.Repositories;
+using CertiWeb.API.IAM.Domain.Services;
+using CertiWeb.API.IAM.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -98,6 +102,10 @@ builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICarCommandService, CarCommandServiceImpl>();
 builder.Services.AddScoped<ICarQueryService, CarQueryServiceImpl>();
 builder.Services.AddScoped<BrandQueryServiceImpl>();
+
+// IAM Bounded Context Injection Configuration
+builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
+builder.Services.AddScoped<IAdminUserQueryService, AdminUserQueryService>();
 
 var app = builder.Build();
 
