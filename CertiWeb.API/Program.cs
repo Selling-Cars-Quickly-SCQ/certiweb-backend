@@ -12,6 +12,11 @@ using CertiWeb.API.Reservation.Application.Internal.QueryServices;
 using CertiWeb.API.Reservation.Domain.Repositories;
 using CertiWeb.API.Reservation.Domain.Services;
 using CertiWeb.API.Reservation.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.Certifications.Application.Internal.CommandServices;
+using CertiWeb.API.Certifications.Application.Internal.QueryServices;
+using CertiWeb.API.Certifications.Domain.Repositories;
+using CertiWeb.API.Certifications.Domain.Services;
+using CertiWeb.API.Certifications.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -86,6 +91,13 @@ builder.Services.AddScoped<IUserQueryService, UserQueryServiceImpl>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationCommandService, ReservationCommandServiceImpl>();
 builder.Services.AddScoped<IReservationQueryService, ReservationQueryServiceImpl>();
+
+// Certifications Bounded Context Dependency Injection Configuration
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<ICarCommandService, CarCommandServiceImpl>();
+builder.Services.AddScoped<ICarQueryService, CarQueryServiceImpl>();
+builder.Services.AddScoped<BrandQueryServiceImpl>();
 
 var app = builder.Build();
 
