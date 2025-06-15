@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using CertiWeb.API.Users.Domain.Model.Aggregates;
 using CertiWeb.API.Certifications.Domain.Model.Aggregates;
 using CertiWeb.API.Certifications.Infrastructure;
+using CertiWeb.API.IAM.Domain.Model.Aggregates;
+using CertiWeb.API.IAM.Infrastructure.Persistence.EFC.Seeders;
 
 namespace CertiWeb.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
@@ -56,6 +58,25 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         // Audit columns for User Context
         builder.Entity<User>().Property(d => d.CreatedDate).HasColumnName("created_at");
         builder.Entity<User>().Property(d => d.UpdatedDate).HasColumnName("updated_at");
+        
+        // AdminUser Context Configuration
+        builder.Entity<AdminUser>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Id).IsRequired().ValueGeneratedOnAdd();
+            entity.Property(a => a.Name).IsRequired().HasMaxLength(100);
+            entity.Property(a => a.Email).IsRequired().HasMaxLength(255);
+            entity.Property(a => a.Password).IsRequired().HasMaxLength(255);
+            
+            // Unique constraint on email
+            entity.HasIndex(a => a.Email).IsUnique();
+            
+            // Audit columns
+            entity.Property(a => a.CreatedDate).HasColumnName("created_at");
+            entity.Property(a => a.UpdatedDate).HasColumnName("updated_at");
+            
+            entity.ToTable("admin_users");
+        });
         
         // Reservation Configuration
         builder.Entity<CertiWeb.API.Reservation.Domain.Model.Aggregates.Reservation>(entity =>
@@ -152,11 +173,14 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         
         // Seed Brand Data
         builder.Entity<Brand>().HasData(BrandSeeder.GetPredefinedBrands());
+        // Seed AdminUser Data
+        builder.Entity<AdminUser>().HasData(AdminUserSeeder.GetAdminUser());
         
         builder.UseSnakeCaseNamingConvention();
     }
     
     public DbSet<User> Users { get; set; }
+    public DbSet<AdminUser> AdminUsers { get; set; }
     public DbSet<Brand> Brands { get; set; }
     public DbSet<Car> Cars { get; set; }
 }
