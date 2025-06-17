@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7871369b-22dd-4fb6-95cb-06cab6064e9d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Aggregates/Users.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Commands/SignInCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Commands/SignUpCommand.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetAllUsersQuery.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetUserByIdQuery.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetUserByUsernameQuery.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Repositories/IUserRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Services/IUserCommandService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Services/IUserQueryService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/AuthenticatedUserResource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/SignInResource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/SignUpResource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/UserResource.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Transform/AuthenticationController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CertiWeb.API/Shared/Infrastructure/Persistence/EFC/Configuration/AppDbContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/CertiWeb.API/Shared/Infrastructure/Persistence/EFC/Configuration/AppDbContext.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Aggregates/Users.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Commands/SignInCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Commands/SignUpCommand.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetAllUsersQuery.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetUserByIdQuery.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Model/Queries/GetUserByUsernameQuery.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Repositories/IUserRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Services/IUserCommandService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Domain/Services/IUserQueryService.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/AuthenticatedUserResource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/SignInResource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/SignUpResource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Resources/UserResource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/IAM/Interfaces/REST/Transform/AuthenticationController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/Shared/Domain/Repositories/IBaseRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/CertiWeb.API/Shared/Infrastructure/Persistence/EFC/Configuration/AppDbContext.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2yOYviy2mbSzC8X03LyxC09MfSo" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "develop",
+    "last_opened_file_path": "D:/GitHub/certiweb-backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7871369b-22dd-4fb6-95cb-06cab6064e9d" name="Changes" comment="" />
+      <created>1749707318717</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1749707318717</updated>
+      <workItem from="1749707320013" duration="1901000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
