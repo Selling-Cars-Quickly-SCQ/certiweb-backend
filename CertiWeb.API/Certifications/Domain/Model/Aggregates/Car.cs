@@ -34,14 +34,13 @@ public class Car
     /// Gets or sets the owner's email.
     /// </summary>
     [Required]
-    [EmailAddress]
-    [MaxLength(255)]
+    [MaxLength(100)]
     public string OwnerEmail { get; set; }
 
     /// <summary>
     /// Gets or sets the car year.
     /// </summary>
-    public required Year Year { get; set; }
+    public Year Year { get; set; }
 
     /// <summary>
     /// Gets or sets the brand ID.
@@ -49,9 +48,10 @@ public class Car
     public int BrandId { get; set; }
 
     /// <summary>
-    /// Gets or sets the brand navigation property.
+    /// Gets or sets the brand.
     /// </summary>
-    public Brand Brand { get; set; }
+    [ForeignKey("BrandId")]
+    public Brand? Brand { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the car model.
@@ -63,31 +63,29 @@ public class Car
     /// <summary>
     /// Gets or sets the car description.
     /// </summary>
-    [MaxLength(1000)]
-    public string Description { get; set; }
-
-    /// <summary>
-    /// Gets or sets the PDF certification as Base64.
-    /// </summary>
-    [Column(TypeName = "TEXT")]
-    public required PdfCertification PdfCertification { get; set; }
-
-    /// <summary>
-    /// Gets or sets the image URL.
-    /// </summary>
-    [Url]
     [MaxLength(500)]
-    public string ImageUrl { get; set; }
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the PDF certification.
+    /// </summary>
+    public PdfCertification PdfCertification { get; set; }
+
+    /// <summary>
+    /// Gets or sets the car image URL.
+    /// </summary>
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; }
 
     /// <summary>
     /// Gets or sets the car price.
     /// </summary>
-    public required Price Price { get; set; }
+    public Price Price { get; set; }
 
     /// <summary>
     /// Gets or sets the license plate.
     /// </summary>
-    public required LicensePlate LicensePlate { get; set; }
+    public LicensePlate LicensePlate { get; set; }
 
     /// <summary>
     /// Gets or sets the original reservation ID.
@@ -95,24 +93,24 @@ public class Car
     public int OriginalReservationId { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the Car class.
+    /// Protected constructor for EF Core.
     /// </summary>
-    public Car()
+    protected Car()
     {
         Title = string.Empty;
         Owner = string.Empty;
         OwnerEmail = string.Empty;
         Model = string.Empty;
-        Description = string.Empty;
-        ImageUrl = string.Empty;
-        Brand = new Brand();
+        Year = null!;
+        PdfCertification = null!;
+        Price = null!;
+        LicensePlate = null!;
     }
 
     /// <summary>
-    /// Initializes a new instance of the Car class with the specified creation command.
+    /// Initializes a new instance of the Car class.
     /// </summary>
-    /// <param name="command">The command containing the car's initial data.</param>
-    [SetsRequiredMembers]
+    /// <param name="command">The command containing the car data.</param>
     public Car(CreateCarCommand command)
     {
         Title = command.Title;
@@ -121,12 +119,11 @@ public class Car
         Year = new Year(command.Year);
         BrandId = command.BrandId;
         Model = command.Model;
-        Description = command.Description ?? string.Empty;
+        Description = command.Description;
         PdfCertification = new PdfCertification(command.PdfCertification);
-        ImageUrl = command.ImageUrl ?? string.Empty;
+        ImageUrl = command.ImageUrl;
         Price = new Price(command.Price);
         LicensePlate = new LicensePlate(command.LicensePlate);
         OriginalReservationId = command.OriginalReservationId;
-        Brand = new Brand();
     }
 }
