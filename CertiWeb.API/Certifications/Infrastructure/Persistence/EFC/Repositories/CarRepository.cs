@@ -12,6 +12,29 @@ namespace CertiWeb.API.Certifications.Infrastructure.Persistence.EFC.Repositorie
 public class CarRepository(AppDbContext context) : BaseRepository<Car>(context), ICarRepository
 {
     /// <summary>
+    /// Gets all cars with their brand information included.
+    /// </summary>
+    /// <returns>A collection of all cars with brand details.</returns>
+    public new async Task<IEnumerable<Car>> ListAsync()
+    {
+        return await Context.Set<Car>()
+            .Include(c => c.Brand)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Finds a car by ID with brand information included.
+    /// </summary>
+    /// <param name="id">The car ID to search for.</param>
+    /// <returns>The car with brand details if found, null otherwise.</returns>
+    public new async Task<Car?> FindByIdAsync(int id)
+    {
+        return await Context.Set<Car>()
+            .Include(c => c.Brand)
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
+
+    /// <summary>
     /// Finds cars by brand ID using Entity Framework Core.
     /// </summary>
     /// <param name="brandId">The brand ID to search for.</param>
