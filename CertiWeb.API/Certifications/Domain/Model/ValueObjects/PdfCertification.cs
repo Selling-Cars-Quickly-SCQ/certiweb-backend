@@ -12,12 +12,22 @@ public record PdfCertification
     public PdfCertification(string base64Data)
     {
         if (string.IsNullOrWhiteSpace(base64Data))
-            throw new ArgumentException("PDF certification data cannot be empty", nameof(base64Data));
+        {
+            Base64Data = string.Empty;
+            return;
+        }
         
-        if (base64Data.Length < 10)
-            throw new ArgumentException("PDF certification data is too short", nameof(base64Data));
+        string cleanedData = base64Data;
+        if (base64Data.StartsWith("data:application/pdf;base64,"))
+        {
+            cleanedData = base64Data.Substring("data:application/pdf;base64,".Length);
+            Console.WriteLine($"Removed data URL prefix. Original length: {base64Data.Length}, Cleaned length: {cleanedData.Length}");
+        }
         
-        Base64Data = base64Data;
+        if (cleanedData.Length < 10)
+            throw new ArgumentException("PDF certification data is too short (minimum 10 characters)", nameof(base64Data));
+        
+        Base64Data = cleanedData;
     }
 
     /// <summary>
@@ -25,6 +35,8 @@ public record PdfCertification
     /// </summary>
     public bool IsValidBase64()
     {
+        if (string.IsNullOrEmpty(Base64Data)) return true;
+        
         try
         {
             Convert.FromBase64String(Base64Data);
@@ -36,6 +48,6 @@ public record PdfCertification
         }
     }
 
-    public static implicit operator string(PdfCertification pdf) => pdf.Base64Data;
-    public static implicit operator PdfCertification(string base64Data) => new(base64Data);
+    public static implicit operator string(PdfCertification certification) => certification.Base64Data;
+    public static implicit operator PdfCertification(string value) => new(value);
 }
