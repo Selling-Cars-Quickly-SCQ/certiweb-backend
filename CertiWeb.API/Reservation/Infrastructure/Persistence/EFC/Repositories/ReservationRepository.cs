@@ -52,8 +52,10 @@ public class ReservationRepository : BaseRepository<ReservationEntity>, IReserva
     /// <returns>True if a reservation exists, false otherwise.</returns>
     public async Task<bool> ExistsReservationForLicensePlateAndDateTimeAsync(string licensePlate, DateTime inspectionDateTime)
     {
+        var cleanLicensePlate = licensePlate.Replace("-", "").ToUpper();
         return await Context.Set<ReservationEntity>()
-            .AnyAsync(r => r.LicensePlate.ToUpper() == licensePlate.ToUpper() && 
-                          r.InspectionDateTime == inspectionDateTime);
+            .AnyAsync(r => r.LicensePlate.Replace("-", "").ToUpper() == cleanLicensePlate &&
+                          r.InspectionDateTime.Date == inspectionDateTime.Date &&
+                          r.InspectionDateTime.Hour == inspectionDateTime.Hour);
     }
 }
