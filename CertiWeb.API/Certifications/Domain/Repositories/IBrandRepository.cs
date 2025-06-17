@@ -9,11 +9,11 @@ namespace CertiWeb.API.Certifications.Domain.Repositories;
 public interface IBrandRepository : IBaseRepository<Brand>
 {
     /// <summary>
-    /// Finds a brand by name.
+    /// Finds a brand by its ID.
     /// </summary>
-    /// <param name="name">The brand name to search for.</param>
+    /// <param name="brandId">The brand ID to search for.</param>
     /// <returns>The brand if found, null otherwise.</returns>
-    Task<Brand?> FindBrandByNameAsync(string name);
+    Task<Brand?> FindBrandByIdAsync(int brandId);
     
     /// <summary>
     /// Gets all active brands.
