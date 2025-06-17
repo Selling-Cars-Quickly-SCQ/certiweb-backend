@@ -22,4 +22,11 @@ public interface IReservationCommandService
     /// <param name="command">The command containing the reservation ID and new status.</param>
     /// <returns>The updated reservation.</returns>
     Task<ReservationEntity?> Handle(UpdateReservationStatusCommand command);
+    
+    /// <summary>
+    /// Deletes a reservation from the system.
+    /// </summary>
+    /// <param name="command">The command containing the reservation ID to delete.</param>
+    /// <returns>True if the reservation was deleted successfully, false otherwise.</returns>
+    Task<bool> Handle(DeleteReservationCommand command);
 }
