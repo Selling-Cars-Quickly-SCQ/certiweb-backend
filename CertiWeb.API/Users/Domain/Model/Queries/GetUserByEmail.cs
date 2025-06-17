@@ -1,4 +1,4 @@
-﻿namespace CertiWeb.API.Users.Domain.Model.Queries;
+namespace CertiWeb.API.Users.Domain.Model.Queries;
 
 /// <summary>
 /// Query for retrieving a user by their email address.
