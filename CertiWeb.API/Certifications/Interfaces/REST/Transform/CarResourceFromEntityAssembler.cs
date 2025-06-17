@@ -15,20 +15,22 @@ public static class CarResourceFromEntityAssembler
     /// <returns>The corresponding resource.</returns>
     public static CarResource ToResourceFromEntity(Car entity)
     {
-        return new CarResource(
-            entity.Id,
-            entity.Title,
-            entity.Owner,
-            entity.OwnerEmail,
-            entity.Year.Value,
-            entity.Brand?.Name ?? "Unknown",
-            entity.Model,
-            entity.Description,
-            entity.PdfCertification.Base64Data,
-            entity.ImageUrl,
-            entity.Price.Value,
-            entity.LicensePlate.Value,
-            entity.OriginalReservationId
-        );
+        return new CarResource
+        {
+            Id = entity.Id,
+            Title = entity.Title ?? string.Empty,
+            Owner = entity.Owner ?? string.Empty,
+            OwnerEmail = entity.OwnerEmail ?? string.Empty,
+            Year = entity.Year,
+            BrandId = entity.BrandId,
+            Brand = entity.Brand?.Name ?? string.Empty,
+            Model = entity.Model ?? string.Empty,
+            Description = entity.Description ?? string.Empty,
+            ImageUrl = entity.ImageUrl ?? string.Empty,
+            Price = entity.Price,
+            LicensePlate = entity.LicensePlate ?? string.Empty,
+            OriginalReservationId = entity.OriginalReservationId,
+            HasPdfCertification = !string.IsNullOrEmpty(entity.PdfCertification?.Base64Data)
+        };
     }
 }
