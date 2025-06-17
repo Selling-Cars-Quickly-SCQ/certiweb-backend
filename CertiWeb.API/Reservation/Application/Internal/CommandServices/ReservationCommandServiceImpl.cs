@@ -33,31 +33,27 @@ public class ReservationCommandServiceImpl : IReservationCommandService
     /// <returns>The created reservation.</returns>
     public async Task<ReservationEntity?> Handle(CreateReservationCommand command)
     {
-        // Validate license plate format (max 6 characters, uppercase letters and numbers)
-        if (string.IsNullOrWhiteSpace(command.LicensePlate) || 
-            command.LicensePlate.Length > 6 || 
-            !command.LicensePlate.All(c => char.IsLetterOrDigit(c)))
+        // Clean and validate license plate format
+        var cleanLicensePlate = command.LicensePlate?.Replace("-", "").ToUpper() ?? string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(cleanLicensePlate) || 
+            cleanLicensePlate.Length > 6 || 
+            !cleanLicensePlate.All(c => char.IsLetterOrDigit(c)))
         {
-            throw new ArgumentException("License plate must be max 6 characters with letters and numbers only.");
+            throw new ArgumentException("License plate must be max 6 characters with letters and numbers only (format: XXX-XXX or XXXXXX).");
         }
 
         // Check if license plate already has a reservation for the same date/time
+        // Use the clean license plate for the check
         var existingReservation = await _reservationRepository
-            .ExistsReservationForLicensePlateAndDateTimeAsync(command.LicensePlate, command.InspectionDateTime);
+            .ExistsReservationForLicensePlateAndDateTimeAsync(cleanLicensePlate, command.InspectionDateTime);
         
         if (existingReservation)
         {
             throw new InvalidOperationException("A reservation already exists for this license plate at the specified date and time.");
         }
 
-        // Validate inspection time slots (9:00AM, 11:00AM, 1:00PM, 3:00PM, 5:00PM)
-        var validHours = new[] { 9, 11, 13, 15, 17 };
-        if (!validHours.Contains(command.InspectionDateTime.Hour) || 
-            command.InspectionDateTime.Minute != 0 || 
-            command.InspectionDateTime.Second != 0)
-        {
-            throw new ArgumentException("Inspection time must be one of: 9:00AM, 11:00AM, 1:00PM, 3:00PM, 5:00PM.");
-        }
+        
 
         var reservation = new ReservationEntity(command);
         
@@ -101,6 +97,33 @@ public class ReservationCommandServiceImpl : IReservationCommandService
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Handles the deletion of a reservation.
+    /// </summary>
+    /// <param name="command">The command containing the reservation ID to delete.</param>
+    /// <returns>True if the reservation was deleted successfully, false otherwise.</returns>
+    public async Task<bool> Handle(DeleteReservationCommand command)
+    {
+        try
+        {
+            var reservation = await _reservationRepository.FindByIdAsync(command.ReservationId);
+            if (reservation == null)
+            {
+                return false;
+            }
+
+            _reservationRepository.Remove(reservation);
+            await _unitOfWork.CompleteAsync();
+            
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting reservation with ID {command.ReservationId}: {ex.Message}");
+            return false;
         }
     }
 }
