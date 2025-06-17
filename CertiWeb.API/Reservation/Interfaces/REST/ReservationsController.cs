@@ -135,7 +135,7 @@ public class ReservationsController : ControllerBase
     /// <param name="reservationId">The reservation ID.</param>
     /// <param name="status">The new status.</param>
     /// <returns>The updated reservation.</returns>
-    [HttpPatch("{reservationId}/status")]
+    [HttpPut("{reservationId}/status")]
     [SwaggerOperation(
         Summary = "Updates reservation status",
         Description = "Updates the status of the given reservation",
@@ -149,5 +149,61 @@ public class ReservationsController : ControllerBase
         if (reservation == null) return NotFound();
         var reservationResource = ReservationResourceFromEntityAssembler.ToResourceFromEntity(reservation);
         return Ok(reservationResource);
+    }
+
+    /// <summary>
+    /// Updates a reservation.
+    /// </summary>
+    /// <param name="reservationId">The reservation ID.</param>
+    /// <param name="resource">The updated reservation data.</param>
+    /// <returns>The updated reservation.</returns>
+    [HttpPut("{reservationId}")]
+    [SwaggerOperation(
+        Summary = "Updates a reservation",
+        Description = "Updates a reservation with the provided data",
+        OperationId = "UpdateReservation")]
+    [SwaggerResponse(200, "The reservation was updated", typeof(ReservationResource))]
+    [SwaggerResponse(404, "The reservation was not found")]
+    [SwaggerResponse(400, "The reservation data is invalid")]
+    public async Task<IActionResult> UpdateReservation([FromRoute] int reservationId, [FromBody] UpdateReservationResource resource)
+    {
+        var updateReservationStatusCommand = new UpdateReservationStatusCommand(reservationId, resource.Status);
+        var reservation = await _reservationCommandService.Handle(updateReservationStatusCommand);
+        if (reservation == null) return NotFound();
+        var reservationResource = ReservationResourceFromEntityAssembler.ToResourceFromEntity(reservation);
+        return Ok(reservationResource);
+    }
+
+    /// <summary>
+    /// Deletes a reservation from the system.
+    /// </summary>
+    /// <param name="reservationId">The ID of the reservation to delete.</param>
+    /// <returns>NoContent if successful, NotFound if reservation doesn't exist.</returns>
+    [HttpDelete("{reservationId}")]
+    [SwaggerOperation(
+        Summary = "Deletes a reservation",
+        Description = "Deletes a reservation from the system",
+        OperationId = "DeleteReservation")]
+    [SwaggerResponse(204, "The reservation was deleted successfully")]
+    [SwaggerResponse(404, "The reservation was not found")]
+    [SwaggerResponse(500, "Internal server error")]
+    public async Task<IActionResult> DeleteReservation([FromRoute] int reservationId)
+    {
+        try
+        {
+            var deleteReservationCommand = new DeleteReservationCommand(reservationId);
+            var result = await _reservationCommandService.Handle(deleteReservationCommand);
+            
+            if (!result)
+            {
+                return NotFound(new { message = "Reservation not found" });
+            }
+            
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Internal server error", details = ex.Message });
+        }
     }
 }
