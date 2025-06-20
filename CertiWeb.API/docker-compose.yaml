@@ -1,0 +1,28 @@
+services:
+  api:
+    image: "monocrack/certiweb-backend"
+    ports:
+      - "3000:8080"
+    depends_on:
+      - mysql
+    environment:
+      - ConnectionStrings__DefaultConnection=server=mysql;user=root;password=root;database=certiweb
+    networks:
+      - certiweb-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: certiweb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - certiweb-network
+
+volumes:
+  mysql_data:
+
+networks:
+  certiweb-network:
+    driver: bridge
