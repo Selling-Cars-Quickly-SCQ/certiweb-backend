@@ -1,30 +1,15 @@
-# Fase de ejecución: usa el runtime de ASP.NET 9.0
-# CAMBIO: Usar la imagen base de .NET 9
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 5117
-EXPOSE 5118
+FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:3fcf6f1e809c0553f9feb222369f58749af314af6f063f389cbd2f913b4ad556 AS build
+WORKDIR /App
 
-# Fase de compilación: usa el SDK (kit de desarrollo) de .NET 9.0
-# CAMBIO: Usar la imagen del SDK de .NET 9
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["CertiWeb.API.csproj", "."]
-# Puede que necesites restaurar paquetes de feeds específicos para previews
-RUN dotnet restore "./CertiWeb.API.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./CertiWeb.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy everything
+COPY . ./
+# Restore as distinct layers
+RUN dotnet restore
+# Build and publish a release
+RUN dotnet publish -o out
 
-# Fase de publicación
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./CertiWeb.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Fase final
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0@sha256:b4bea3a52a0a77317fa93c5bbdb076623f81e3e2f201078d89914da71318b5d8
+WORKDIR /App
+COPY --from=build /App/out .
 ENTRYPOINT ["dotnet", "CertiWeb.API.dll"]
