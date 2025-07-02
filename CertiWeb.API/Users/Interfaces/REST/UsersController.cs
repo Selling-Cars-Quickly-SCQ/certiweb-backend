@@ -1,5 +1,8 @@
 using System.Net.Mime;
+using CertiWeb.API.Users.Application.Internal.OutboundServices;
+using CertiWeb.API.Shared.Domain.Repositories;
 using CertiWeb.API.Users.Domain.Model.Queries;
+using CertiWeb.API.Users.Domain.Repositories;
 using CertiWeb.API.Users.Domain.Services;
 using CertiWeb.API.Users.Interfaces.REST.Resources;
 using CertiWeb.API.Users.Interfaces.REST.Transform;
@@ -15,8 +18,28 @@ namespace CertiWeb.API.Users.Interfaces.REST;
 /// <summary>
 /// REST API controller for managing user operations.
 /// </summary>
-public class UsersController(IUserCommandService userCommandService, IUserQueryService userQueryService) : ControllerBase
+public class UsersController : ControllerBase
 {
+    private readonly IUserCommandService userCommandService;
+    private readonly IUserQueryService userQueryService;
+    private readonly IHashingService hashingService;
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IUserRepository userRepository;
+
+    public UsersController(
+        IUserCommandService userCommandService, 
+        IUserQueryService userQueryService,
+        IHashingService hashingService,
+        IUnitOfWork unitOfWork,
+        IUserRepository userRepository)
+    {
+        this.userCommandService = userCommandService;
+        this.userQueryService = userQueryService;
+        this.hashingService = hashingService;
+        this.unitOfWork = unitOfWork;
+        this.userRepository = userRepository;
+    }
+    
     /// <summary>
     /// Creates a new user in the system.
     /// </summary>
@@ -76,4 +99,47 @@ public class UsersController(IUserCommandService userCommandService, IUserQueryS
         var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
         return Ok(userResource);
     }
+
+    [HttpPost("migrate-passwords")]
+    public async Task<IActionResult> MigratePasswords()
+    {
+        var getAllUsersQuery = new GetAllUsersQuery();
+        var users = await userQueryService.Handle(getAllUsersQuery);
+        
+        foreach (var user in users)
+        {
+            // Check if password is already hashed (BCrypt hashes start with $2a$, $2b$, or $2y$)
+            if (!user.password.StartsWith("$2"))
+            {
+                // Hash the plain text password
+                var hashedPassword = hashingService.HashPassword(user.password);
+                
+                // Update the user with hashed password using the synchronous Update method
+                user.password = hashedPassword;
+                userRepository.Update(user);
+            }
+        }
+        
+        await unitOfWork.CompleteAsync();
+        return Ok("Passwords migrated successfully");
+    }
+
+    [HttpPost("test-password")]
+    public async Task<IActionResult> TestPassword([FromBody] TestPasswordRequest request)
+    {
+        var user = await userRepository.FindUserByEmailAsync(request.Email);
+        if (user == null) return NotFound("User not found");
+        
+        var isValid = hashingService.VerifyPassword(request.Password, user.password);
+        
+        return Ok(new {
+            Email = request.Email,
+            PasswordEntered = request.Password,
+            StoredPasswordHash = user.password,
+            IsValid = isValid,
+            HashStartsWithDollar2 = user.password.StartsWith("$2")
+        });
+    }
+
+    public record TestPasswordRequest(string Email, string Password);
 }
