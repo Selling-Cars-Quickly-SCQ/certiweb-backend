@@ -21,6 +21,8 @@ using CertiWeb.API.IAM.Application.Internal.QueryServices;
 using CertiWeb.API.IAM.Domain.Repositories;
 using CertiWeb.API.IAM.Domain.Services;
 using CertiWeb.API.IAM.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.Users.Application.Internal.OutboundServices;
+using CertiWeb.API.Users.Infrastructure.Hashing.BCrypt.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -87,9 +89,11 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Users Bounded Context
+// Users Bounded Context
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandServiceImpl>();
 builder.Services.AddScoped<IUserQueryService, UserQueryServiceImpl>();
+builder.Services.AddScoped<IHashingService, HashingService>();
 
 // Reservation Bounded Context Dependency Injection Configuration
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
