@@ -29,7 +29,7 @@ public class AdminUser : IEntityWithCreatedUpdatedDate
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
-    /// Admin user password (stored as plain text for this specific requirement)
+    /// Admin user password (stored as hashed password using BCrypt)
     /// </summary>
     [Required]
     [MaxLength(255)]
