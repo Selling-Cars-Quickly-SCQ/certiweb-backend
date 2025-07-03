@@ -2,13 +2,14 @@ using CertiWeb.API.Users.Domain.Model.Aggregates;
 using CertiWeb.API.Users.Domain.Model.Queries;
 using CertiWeb.API.Users.Domain.Repositories;
 using CertiWeb.API.Users.Domain.Services;
+using CertiWeb.API.Users.Application.Internal.OutboundServices;
 
 namespace CertiWeb.API.Users.Application.Internal.QueryServices;
 
 /// <summary>
 /// Implementation of the user query service that handles user retrieval operations.
 /// </summary>
-public class UserQueryServiceImpl(IUserRepository userRepository) : IUserQueryService
+public class UserQueryServiceImpl(IUserRepository userRepository, IHashingService hashingService) : IUserQueryService
 {
     /// <summary>
     /// Retrieves all users from the system.
@@ -47,6 +48,18 @@ public class UserQueryServiceImpl(IUserRepository userRepository) : IUserQuerySe
     /// <returns>The user if found with matching credentials, null otherwise.</returns>
     public async Task<User?> Handle(GetUserByEmailAndPassword query)
     {
-        return await userRepository.FindUserByEmailAndPasswordAsync(query.email, query.password);
+        // First, find the user by email
+        var user = await userRepository.FindUserByEmailAsync(query.email);
+        
+        // If user not found, return null
+        if (user == null) return null;
+        
+        // Verify the password using the hashing service
+        // query.password = contraseña original del frontend
+        // user.password = contraseña hasheada almacenada en BD
+        var isPasswordValid = hashingService.VerifyPassword(query.password, user.password);
+        
+        // Return user only if password is valid
+        return isPasswordValid ? user : null;
     }
 }

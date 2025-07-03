@@ -20,15 +20,4 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
     {
         return await Context.Set<User>().FirstOrDefaultAsync(u => u.email == email);
     }
-    
-    /// <summary>
-    /// Finds a user by their email address and password using Entity Framework Core.
-    /// </summary>
-    /// <param name="email">The email address to search for.</param>
-    /// <param name="password">The password to verify.</param>
-    /// <returns>The user if found with matching credentials, null otherwise.</returns>
-    public async Task<User?> FindUserByEmailAndPasswordAsync(string email, string password)
-    {
-        return await Context.Set<User>().FirstOrDefaultAsync(u => u.email == email && u.password == password);
-    }
 }
