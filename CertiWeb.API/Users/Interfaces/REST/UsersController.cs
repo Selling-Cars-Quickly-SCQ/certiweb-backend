@@ -90,16 +90,38 @@ public class UsersController : ControllerBase
     /// <param name="email">The email address of the user.</param>
     /// <param name="password">The password of the user.</param>
     /// <returns>The user resource if authentication is successful, Unauthorized if credentials are invalid.</returns>
-    [HttpGet("login")]
-    public async Task<ActionResult<UserResource>> LoginUser([FromQuery] string email, [FromQuery] string password)
+    /// <summary>
+    /// Authenticates a user by validating their email and password credentials.
+    /// </summary>
+    /// <param name="request">The login request containing email and password.</param>
+    /// <returns>The user resource if authentication is successful, Unauthorized if credentials are invalid.</returns>
+    [HttpPost("login")]
+    public async Task<ActionResult<UserResource>> LoginUser([FromBody] LoginRequest request)
     {
-        var getUserByEmailAndPasswordQuery = new GetUserByEmailAndPassword(email, password);
-        var user = await userQueryService.Handle(getUserByEmailAndPasswordQuery);
-        if (user == null) return Unauthorized("Invalid email or password");
+        var getUserByEmailQuery = new GetUserByEmail(request.Email);
+        var user = await userQueryService.Handle(getUserByEmailQuery);
+        
+        if (user == null)
+        {
+            return Unauthorized("Invalid email or password");
+        }
+        
+        var isPasswordValid = hashingService.VerifyPassword(request.Password, user.password);
+        
+        if (!isPasswordValid)
+        {
+            return Unauthorized("Invalid email or password");
+        }
+        
         var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
         return Ok(userResource);
     }
 
+    /// <summary>
+    /// Migrates existing plain-text passwords to hashed passwords using BCrypt.
+    /// This endpoint should be used only once during system migration.
+    /// </summary>
+    /// <returns>Success message if migration completes successfully.</returns>
     [HttpPost("migrate-passwords")]
     public async Task<IActionResult> MigratePasswords()
     {
@@ -108,13 +130,11 @@ public class UsersController : ControllerBase
         
         foreach (var user in users)
         {
-            // Check if password is already hashed (BCrypt hashes start with $2a$, $2b$, or $2y$)
             if (!user.password.StartsWith("$2"))
             {
-                // Hash the plain text password
+                
                 var hashedPassword = hashingService.HashPassword(user.password);
                 
-                // Update the user with hashed password using the synchronous Update method
                 user.password = hashedPassword;
                 userRepository.Update(user);
             }
@@ -124,6 +144,12 @@ public class UsersController : ControllerBase
         return Ok("Passwords migrated successfully");
     }
 
+    /// <summary>
+    /// Tests password verification for debugging purposes.
+    /// Compares a plain-text password against the stored hash for a given user.
+    /// </summary>
+    /// <param name="request">The test request containing email and password to verify.</param>
+    /// <returns>Detailed information about the password verification process.</returns>
     [HttpPost("test-password")]
     public async Task<IActionResult> TestPassword([FromBody] TestPasswordRequest request)
     {
@@ -141,5 +167,11 @@ public class UsersController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Data transfer object for password testing requests.
+    /// Used for debugging password verification functionality.
+    /// </summary>
+    /// <param name="Email">The email address of the user to test.</param>
+    /// <param name="Password">The plain-text password to verify against the stored hash.</param>
     public record TestPasswordRequest(string Email, string Password);
 }
