@@ -21,6 +21,11 @@ public class AdminUserResource
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
+    /// Admin user hashed password
+    /// </summary>
+    public string Password { get; set; } = string.Empty;
+
+    /// <summary>
     /// Date when the admin user was created
     /// </summary>
     public DateTimeOffset? CreatedDate { get; set; }
