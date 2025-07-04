@@ -11,49 +11,30 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace CertiWeb.API.Users.Interfaces.REST;
 
+/// <summary>
+/// REST API controller for managing user CRUD operations.
+/// </summary>
 [ApiController]
 [Route("api/v1/[controller]")]
 [Produces(MediaTypeNames.Application.Json)]
 [SwaggerTag("Available User Endpoints.")]
-/// <summary>
-/// REST API controller for managing user operations.
-/// </summary>
 public class UsersController : ControllerBase
 {
-    private readonly IUserCommandService userCommandService;
     private readonly IUserQueryService userQueryService;
     private readonly IHashingService hashingService;
     private readonly IUnitOfWork unitOfWork;
     private readonly IUserRepository userRepository;
 
     public UsersController(
-        IUserCommandService userCommandService, 
         IUserQueryService userQueryService,
         IHashingService hashingService,
         IUnitOfWork unitOfWork,
         IUserRepository userRepository)
     {
-        this.userCommandService = userCommandService;
         this.userQueryService = userQueryService;
         this.hashingService = hashingService;
         this.unitOfWork = unitOfWork;
         this.userRepository = userRepository;
-    }
-    
-    /// <summary>
-    /// Creates a new user in the system.
-    /// </summary>
-    /// <param name="resource">The user creation data.</param>
-    /// <returns>The created user resource if successful, BadRequest if creation fails.</returns>
-    [HttpPost]
-    public async Task<ActionResult<UserResource>> CreateUser([FromBody] CreateUserResource resource)
-    {
-        var createUserCommand = CreateUserCommandFromResourceAssembler.ToCommandFromResource(resource);
-        var user = await userCommandService.Handle(createUserCommand);
-        if (user == null) return BadRequest();
-        var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
-
-        return CreatedAtAction(nameof(GetUserById), new { userId = user.Id }, userResource);
     }
 
     /// <summary>
@@ -85,39 +66,6 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Authenticates a user by email and password via GET request.
-    /// </summary>
-    /// <param name="email">The email address of the user.</param>
-    /// <param name="password">The password of the user.</param>
-    /// <returns>The user resource if authentication is successful, Unauthorized if credentials are invalid.</returns>
-    /// <summary>
-    /// Authenticates a user by validating their email and password credentials.
-    /// </summary>
-    /// <param name="request">The login request containing email and password.</param>
-    /// <returns>The user resource if authentication is successful, Unauthorized if credentials are invalid.</returns>
-    [HttpPost("login")]
-    public async Task<ActionResult<UserResource>> LoginUser([FromBody] LoginRequest request)
-    {
-        var getUserByEmailQuery = new GetUserByEmail(request.Email);
-        var user = await userQueryService.Handle(getUserByEmailQuery);
-        
-        if (user == null)
-        {
-            return Unauthorized("Invalid email or password");
-        }
-        
-        var isPasswordValid = hashingService.VerifyPassword(request.Password, user.password);
-        
-        if (!isPasswordValid)
-        {
-            return Unauthorized("Invalid email or password");
-        }
-        
-        var userResource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
-        return Ok(userResource);
-    }
-
-    /// <summary>
     /// Migrates existing plain-text passwords to hashed passwords using BCrypt.
     /// This endpoint should be used only once during system migration.
     /// </summary>
@@ -132,9 +80,7 @@ public class UsersController : ControllerBase
         {
             if (!user.password.StartsWith("$2"))
             {
-                
                 var hashedPassword = hashingService.HashPassword(user.password);
-                
                 user.password = hashedPassword;
                 userRepository.Update(user);
             }
