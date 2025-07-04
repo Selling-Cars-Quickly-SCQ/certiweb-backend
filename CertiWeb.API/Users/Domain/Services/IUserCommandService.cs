@@ -12,6 +12,6 @@ public interface IUserCommandService
     /// Handles the creation of a new user.
     /// </summary>
     /// <param name="command">The command containing the user creation data.</param>
-    /// <returns>The created user if successful, null if an error occurs.</returns>
-    Task<User?> Handle(CreateUserCommand command);
+    /// <returns>A tuple containing the created user (if successful, null if an error occurs) and the generated JWT token.</returns>
+    Task<(User? user, string token)> Handle(CreateUserCommand command);
 }
