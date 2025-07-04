@@ -23,6 +23,9 @@ using CertiWeb.API.IAM.Domain.Services;
 using CertiWeb.API.IAM.Infrastructure.Persistence.EFC.Repositories;
 using CertiWeb.API.Users.Application.Internal.OutboundServices;
 using CertiWeb.API.Users.Infrastructure.Hashing.BCrypt.Services;
+using CertiWeb.API.Users.Infrastructure.Pipeline.Middleware.Extensions;
+using CertiWeb.API.Users.Infrastructure.Tokens.JWT.Configuration;
+using CertiWeb.API.Users.Infrastructure.Tokens.JWT.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -80,6 +83,29 @@ builder.Services.AddSwaggerGen(options =>
                 Url = new Uri("https://www.apache.org/licenses/LICENSE-2.0.html")
             }
         });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
     options.EnableAnnotations();
 });
 
@@ -88,12 +114,16 @@ builder.Services.AddSwaggerGen(options =>
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Users Bounded Context
+// TokenSettings Configuration
+
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
 // Users Bounded Context
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserCommandService, UserCommandServiceImpl>();
 builder.Services.AddScoped<IUserQueryService, UserQueryServiceImpl>();
 builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Reservation Bounded Context Dependency Injection Configuration
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
@@ -131,7 +161,7 @@ app.UseSwaggerUI();
 app.UseCors("AllowAllPolicy");
 
 // Add Authorization Middleware to Pipeline
-//app.UseRequestAuthorization();
+app.UseRequestAuthorization();
 
 app.UseHttpsRedirection();
 
