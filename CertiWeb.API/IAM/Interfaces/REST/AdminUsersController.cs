@@ -3,6 +3,8 @@ using CertiWeb.API.IAM.Interfaces.REST.Resources;
 using CertiWeb.API.Users.Application.Internal.OutboundServices;
 using CertiWeb.API.IAM.Domain.Repositories;
 using CertiWeb.API.Shared.Domain.Repositories;
+using CertiWeb.API.Users.Infrastructure.Pipeline.Middleware.Attributes;
+using CertiWeb.API.Users.Domain.Model.Aggregates; // Agregar este using para User
 using Microsoft.AspNetCore.Mvc;
 
 namespace CertiWeb.API.IAM.Interfaces.REST;
@@ -19,6 +21,7 @@ public class AdminUsersController : ControllerBase
     private readonly IHashingService _hashingService;
     private readonly IAdminUserRepository _adminUserRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITokenService _tokenService;
 
     /// <summary>
     /// Constructor for AdminUsersController
@@ -27,16 +30,19 @@ public class AdminUsersController : ControllerBase
     /// <param name="hashingService">Password hashing service</param>
     /// <param name="adminUserRepository">Admin user repository</param>
     /// <param name="unitOfWork">Unit of work for database operations</param>
+    /// <param name="tokenService">Token service for JWT generation</param>
     public AdminUsersController(
         IAdminUserQueryService adminUserQueryService, 
         IHashingService hashingService,
         IAdminUserRepository adminUserRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ITokenService tokenService)
     {
         _adminUserQueryService = adminUserQueryService;
         _hashingService = hashingService;
         _adminUserRepository = adminUserRepository;
         _unitOfWork = unitOfWork;
+        _tokenService = tokenService;
     }
 
     /// <summary>
@@ -47,6 +53,7 @@ public class AdminUsersController : ControllerBase
     /// <response code="200">Returns the authenticated admin user</response>
     /// <response code="401">If the credentials are invalid</response>
     /// <response code="404">If the admin user is not found</response>
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> LoginAdmin([FromBody] LoginAdminRequest request)
     {
@@ -58,26 +65,31 @@ public class AdminUsersController : ControllerBase
             {
                 return NotFound(new { message = "Admin user not found" });
             }
-
+    
             // Verify password
             var isValidPassword = _hashingService.VerifyPassword(request.Password, adminUser.Password);
             if (!isValidPassword)
             {
                 return Unauthorized(new { message = "Invalid credentials" });
             }
-
-            // Return admin user data
-            var adminUserResource = new AdminUserResource
+    
+            // Generate JWT token for admin
+            var token = _tokenService.GenerateToken(new User 
             {
-                Id = adminUser.Id,
-                Name = adminUser.Name,
-                Email = adminUser.Email,
-                Password = adminUser.Password, // En producción, considera no incluir la contraseña
-                CreatedDate = adminUser.CreatedDate,
-                UpdatedDate = adminUser.UpdatedDate
-            };
-
-            return Ok(adminUserResource);
+                name = adminUser.Name,     
+                email = adminUser.Email,   
+                password = adminUser.Password,
+                plan = "admin"             
+            });
+    
+            // Return admin user data with token
+            return Ok(new {
+                id = adminUser.Id,
+                name = adminUser.Name,
+                email = adminUser.Email,
+                token = token,
+                isAdmin = true
+            });
         }
         catch (Exception ex)
         {
