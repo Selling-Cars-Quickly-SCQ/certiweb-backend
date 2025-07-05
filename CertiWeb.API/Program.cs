@@ -17,15 +17,19 @@ using CertiWeb.API.Certifications.Application.Internal.QueryServices;
 using CertiWeb.API.Certifications.Domain.Repositories;
 using CertiWeb.API.Certifications.Domain.Services;
 using CertiWeb.API.Certifications.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.IAM.Application.ACL;
 using CertiWeb.API.IAM.Application.Internal.QueryServices;
 using CertiWeb.API.IAM.Domain.Repositories;
 using CertiWeb.API.IAM.Domain.Services;
 using CertiWeb.API.IAM.Infrastructure.Persistence.EFC.Repositories;
+using CertiWeb.API.IAM.Interfaces.ACL;
+using CertiWeb.API.Users.Application.ACL;
 using CertiWeb.API.Users.Application.Internal.OutboundServices;
 using CertiWeb.API.Users.Infrastructure.Hashing.BCrypt.Services;
 using CertiWeb.API.Users.Infrastructure.Pipeline.Middleware.Extensions;
 using CertiWeb.API.Users.Infrastructure.Tokens.JWT.Configuration;
 using CertiWeb.API.Users.Infrastructure.Tokens.JWT.Services;
+using CertiWeb.API.Users.Interfaces.ACL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -140,6 +144,10 @@ builder.Services.AddScoped<BrandQueryServiceImpl>();
 // IAM Bounded Context Injection Configuration
 builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
 builder.Services.AddScoped<IAdminUserQueryService, AdminUserQueryService>();
+
+// ACL Services Registration
+builder.Services.AddScoped<IIamContextFacade, IamContextFacade>();
+builder.Services.AddScoped<IUsersContextFacade, UsersContextFacade>();
 
 var app = builder.Build();
 
